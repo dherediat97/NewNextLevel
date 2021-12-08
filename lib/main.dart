@@ -34,9 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    api
-        .getAllLolChampions("11.23.1", "es_ES")
-        .then((value) => {championList = value});
+    // api
+    //     .getAllLolChampions("11.23.1", "es_ES")
+    //     .then((value) => {championList = value});
   }
 
   @override
@@ -45,22 +45,24 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text("NextLevel"),
         ),
-        body: (!championList.isNotEmpty)
-            ? Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                    Expanded(
-                        child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 50,
-                            itemBuilder: (context, index) {
-                              print(championList[index].name);
-                              return Column(
-                                children: [Text(championList[index].name)],
-                              );
-                            })),
-                  ])
-            : Container());
+        body: Container()
+        // body: (!championList.isNotEmpty)
+        //     ? Column(
+        //         mainAxisSize: MainAxisSize.max,
+        //         mainAxisAlignment: MainAxisAlignment.start,
+        //         children: <Widget>[
+        //             Expanded(
+        //                 child: ListView.builder(
+        //                     scrollDirection: Axis.horizontal,
+        //                     itemCount: 50,
+        //                     itemBuilder: (context, index) {
+        //                       print(championList[index].name);
+        //                       return Column(
+        //                         children: [Text(championList[index].name)],
+        //                       );
+        //                     })),
+        //           ])
+        //     : Container()
+        );
   }
 }
