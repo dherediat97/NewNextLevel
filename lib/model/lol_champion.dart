@@ -9,7 +9,7 @@ class LolChampion {
   String info;
   String tag;
 
-  factory LolChampion.fromJson(Map<String, dynamic> json) =>
-      _$LolChampionToJson(json);
-  Map<String, dynamic> toJson() => _$LolChampionToJson(this);
+  // factory LolChampion.fromJson(Map<String, dynamic> json) =>
+  //     _$LolChampionToJson(json);
+  // Map<String, dynamic> toJson() => _$LolChampionToJson(this);
 }
