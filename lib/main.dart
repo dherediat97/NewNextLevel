@@ -119,8 +119,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                     Row(
                                       children: <Widget>[
                                         championView(championList[index]),
-                                        // listOfChampions(
-                                        // championList[index]),
                                       ],
                                     ),
                                   ],
