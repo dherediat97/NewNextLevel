@@ -1,49 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:newnextlevel/api.dart';
+import 'package:newnextlevel/util/extensions.dart';
 import 'model/lol_champion.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const NextLevelApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
+class NextLevelApp extends StatelessWidget {
+  const NextLevelApp({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    return mainContent();
+  }
+
+  Widget mainContent() {
     return MaterialApp(
       title: 'Next Level',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: const MyHomePage(),
+      home: const MainPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key}) : super(key: key);
+class MainPage extends StatefulWidget {
+  const MainPage({Key key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MainPageState extends State<MainPage> {
   var api = Api();
   List<LolChampion> championList = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    int _selectedIndex = 0;
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("NextLevel"),
-        ),
+        appBar: AppBar(title: const Text("Next Level"), actions: <Widget>[
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Icon(Icons.search),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: PopupMenuButton(
+              tooltip: "Cambiar Región",
+              icon: const Icon(Icons.more_vert),
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                const PopupMenuItem(
+                  child: ListTile(
+                    leading: Icon(Icons.language),
+                    title: Text('Cambiar Región'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ]),
         body: Row(
           children: <Widget>[
             NavigationRail(
@@ -51,12 +69,15 @@ class _MyHomePageState extends State<MyHomePage> {
               onDestinationSelected: (int index) {
                 setState(() {
                   _selectedIndex = index;
-                  if (_selectedIndex == 0) {
-                    if (championList.isEmpty) getLolChampions();
-                  }
                 });
+                if (_selectedIndex == 0) {
+                  if (championList.isEmpty) {
+                    getLolChampions();
+                  }
+                } else if (_selectedIndex == 1) {
+                } else if (_selectedIndex == 2) {
+                } else if (_selectedIndex == 3) {}
               },
-              extended: true,
               destinations: const <NavigationRailDestination>[
                 NavigationRailDestination(
                   icon: Icon(Icons.gamepad),
@@ -80,66 +101,71 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            const VerticalDivider(thickness: 0.5, width: 1),
-            listOfChampions()
+            const VerticalDivider(thickness: 1, width: 1),
+            Expanded(
+              child: Center(
+                child: listOfChampions(_selectedIndex),
+              ),
+            )
           ],
         ));
   }
 
-  Widget championView(LolChampion data) {
-    return Row(children: [Image.network(data.image)]);
+  Widget championView(LolChampion champion) {
+    return Row(children: [
+      Image.network(champion.image),
+      Text(champion.name + " - " + champion.title.capitalize())
+    ]);
   }
 
-  Widget listOfChampions() {
-    return Expanded(
-        child: Center(
-            child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-                itemCount: championList.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    padding: const EdgeInsets.fromLTRB(32, 0, 0, 32),
-                    height: 160,
-                    width: 160,
-                    child: Card(
-                      elevation: 20,
-                      child: Padding(
-                        padding: const EdgeInsets.all(0),
-                        child: Stack(children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Stack(
-                              children: <Widget>[
-                                Column(
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        championView(championList[index]),
-                                        // listOfChampions(
-                                        // championList[index]),
-                                      ],
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          )
-                        ]),
+  Widget listOfChampions(int gameSelected) {
+    if (gameSelected == 0) {
+      return Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: ListView.builder(
+                  itemCount: championList.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      padding: const EdgeInsets.fromLTRB(32, 0, 0, 32),
+                      height: 160,
+                      width: 160,
+                      child: Card(
+                        elevation: 20,
+                        child: Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: Stack(children: <Widget>[
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Stack(
+                                children: <Widget>[
+                                  Column(
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          championView(championList[index]),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            )
+                          ]),
+                        ),
                       ),
-                    ),
-                  );
-                }),
-          ),
-        ])));
+                    );
+                  }),
+            ),
+          ]);
+    } else {
+      return Text("Juego Seleccionado $gameSelected");
+    }
   }
 
-  void getLolChampions() {
-    api
-        .getAllLolChampions("11.23.1", "es_ES")
-        .then((value) => {championList = value});
+  getLolChampions() {
+    api.getAllLolChampions("es_ES").then((value) => {championList = value});
   }
 }
