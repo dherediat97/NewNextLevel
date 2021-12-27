@@ -12,9 +12,9 @@ on:
     branches: [ main ]
 
 jobs:
-  web:
+  build:
     runs-on: ubuntu-latest
-
+    # web
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-java@v2
@@ -27,9 +27,7 @@ jobs:
         channel: 'any'
     - run: flutter pub get
     - run: flutter test
-android:
-    runs-on: ubuntu-latest
-    steps:
+    # android
     - uses: actions/checkout@v2
     - uses: actions/setup-java@v2
       with:
