@@ -101,7 +101,7 @@ class _MainPageState extends State<MainPage> {
                 ),
               ],
             ),
-            const VerticalDivider(thickness: 1, width: 1),
+            const VerticalDivider(thickness: 0.5, width: 1),
             Expanded(
               child: Center(
                 child: listOfChampions(_selectedIndex),
@@ -131,12 +131,11 @@ class _MainPageState extends State<MainPage> {
                     return Container(
                       padding: const EdgeInsets.fromLTRB(32, 0, 0, 32),
                       height: 160,
-                      width: 160,
+                      width: 50,
                       child: Card(
-                        elevation: 20,
-                        child: Padding(
-                          padding: const EdgeInsets.all(0),
-                          child: Stack(children: <Widget>[
+                        elevation: 16,
+                        child: Stack(
+                          children: <Widget>[
                             Align(
                               alignment: Alignment.centerRight,
                               child: Stack(
@@ -153,7 +152,7 @@ class _MainPageState extends State<MainPage> {
                                 ],
                               ),
                             )
-                          ]),
+                          ],
                         ),
                       ),
                     );
