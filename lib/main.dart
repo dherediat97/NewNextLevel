@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:newnextlevel/api.dart';
-import 'package:newnextlevel/util/extensions.dart';
 import 'model/lol_champion.dart';
 
 void main() {
@@ -11,157 +10,121 @@ class NextLevelApp extends StatelessWidget {
   const NextLevelApp({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return mainContent();
-  }
-
-  Widget mainContent() {
     return MaterialApp(
-      title: 'Next Level',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-      ),
-      home: const MainPage(),
-    );
+        title: 'Next Level',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+            useMaterial3: true,
+            colorScheme:
+                ColorScheme.fromSwatch(primarySwatch: Colors.deepOrange)),
+        home: MainPage());
   }
+}
+
+class DrawerItem {
+  String title;
+  IconData icon;
+  DrawerItem(this.title, this.icon);
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key key}) : super(key: key);
+  final _drawerItems = [
+    DrawerItem("Pagina Principal", Icons.house),
+    DrawerItem("Campeones", Icons.chalet),
+    DrawerItem("Ajustes", Icons.settings_outlined)
+  ];
+
+  MainPage({Key key}) : super(key: key);
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<StatefulWidget> createState() {
+    return DrawerActivityState();
+  }
 }
 
-class _MainPageState extends State<MainPage> {
-  var api = Api();
-  List<LolChampion> championList = [];
+class DrawerActivityState extends State<MainPage> {
   int _selectedIndex = 0;
 
+  String picsUrl =
+      "https://www.animationmagazine.net/wordpress/wp-content/uploads/wheres-waldo-post-510x451.jpg";
+
+  var api = Api();
+  List<LolChampion> championList = [];
+
+  _getDrawerItemWidget(int pos) {
+    switch (pos) {
+      case 1:
+        getLolChampions();
+        return listOfChampionsLol();
+      default:
+        return const Text("Otra Pagina");
+    }
+  }
+
+  _onSelectItem(int index) {
+    setState(() => _selectedIndex = index);
+    Navigator.of(context).pop();
+  }
+
+  var isDarkMode = true;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text("Next Level"), actions: <Widget>[
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Icon(Icons.search),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: PopupMenuButton(
-              tooltip: "Cambiar Región",
-              icon: const Icon(Icons.more_vert),
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                const PopupMenuItem(
-                  child: ListTile(
-                    leading: Icon(Icons.language),
-                    title: Text('Cambiar Región'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ]),
-        body: Row(
-          children: <Widget>[
-            NavigationRail(
-              selectedIndex: _selectedIndex,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-                if (_selectedIndex == 0) {
-                  if (championList.isEmpty) {
-                    getLolChampions();
-                  }
-                } else if (_selectedIndex == 1) {
-                } else if (_selectedIndex == 2) {
-                } else if (_selectedIndex == 3) {}
-              },
-              destinations: const <NavigationRailDestination>[
-                NavigationRailDestination(
-                  icon: Icon(Icons.gamepad),
-                  selectedIcon: Icon(Icons.gamepad_outlined),
-                  label: Text('League of Legends'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.phone_android),
-                  selectedIcon: Icon(Icons.phone_android),
-                  label: Text('TFT'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.bookmark_border),
-                  selectedIcon: Icon(Icons.book),
-                  label: Text('Legends of Runeterra'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.star_border),
-                  selectedIcon: Icon(Icons.star),
-                  label: Text('Valorant'),
-                ),
-              ],
-            ),
-            const VerticalDivider(thickness: 0.5, width: 1),
-            Expanded(
-              child: Center(
-                child: listOfChampions(_selectedIndex),
-              ),
-            )
-          ],
-        ));
-  }
-
-  Widget championView(LolChampion champion) {
-    return Row(children: [
-      Image.network(champion.image),
-      Text(champion.name + " - " + champion.title.capitalize())
-    ]);
-  }
-
-  Widget listOfChampions(int gameSelected) {
-    if (gameSelected == 0) {
-      return Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                  itemCount: championList.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      padding: const EdgeInsets.fromLTRB(32, 0, 0, 32),
-                      height: 160,
-                      width: 50,
-                      child: Card(
-                        elevation: 16,
-                        child: Stack(
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Stack(
-                                children: <Widget>[
-                                  Column(
-                                    children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          championView(championList[index]),
-                                        ],
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
-            ),
-          ]);
-    } else {
-      return Text("Juego Seleccionado $gameSelected");
+    List<Widget> drawerOpts = [];
+    for (var i = 0; i < widget._drawerItems.length; i++) {
+      var d = widget._drawerItems[i];
+      drawerOpts.add(ListTile(
+          leading: Icon(d.icon),
+          title: Text(d.title),
+          selected: i == _selectedIndex,
+          onTap: () => _onSelectItem(i)));
     }
+
+    return Scaffold(
+        appBar: AppBar(
+            title: Text(widget._drawerItems[_selectedIndex].title),
+            backgroundColor: Colors.deepOrange,
+            foregroundColor: Colors.white),
+        drawer: Drawer(
+            child: Column(children: <Widget>[
+          UserAccountsDrawerHeader(
+              accountEmail: const Text("dherediat@nextlevel.com",
+                  style: TextStyle(fontSize: 18)),
+              accountName: const Text("David", style: TextStyle(fontSize: 16)),
+              currentAccountPicture: GestureDetector(
+                  child: CircleAvatar(backgroundImage: NetworkImage(picsUrl)),
+                  onTap: () => print(""))),
+          Column(children: drawerOpts)
+        ])),
+        body: _getDrawerItemWidget(_selectedIndex));
+  }
+
+  Widget listOfChampionsLol() {
+    return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 1,
+            crossAxisSpacing: 50,
+            mainAxisSpacing: 50),
+        itemCount: championList.length,
+        itemBuilder: (BuildContext ctx, index) {
+          return SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 70,
+            child: Card(
+                color: Colors.white,
+                elevation: 16,
+                child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                            image: NetworkImage(championList[index].image),
+                            fit: BoxFit.fitWidth)),
+                    child: Center(
+                        child: Text(championList[index].name,
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white))))),
+          );
+        });
   }
 
   getLolChampions() {
