@@ -1,6 +1,6 @@
 {
-    "name": "newnextlevel",
-    "short_name": "newnextlevel",
+    "name": "Next Level",
+    "short_name": "NextLevel",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
