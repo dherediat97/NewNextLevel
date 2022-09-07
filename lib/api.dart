@@ -4,14 +4,14 @@ import 'package:newnextlevel/model/lol_response.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:newnextlevel/model/lol_version_response.dart';
+import 'package:newnextlevel/util/constants.dart';
 
 class Api {
   List<LolChampion> champions = [];
-  String baseUrlDDragon = "http://ddragon.leagueoflegends.com";
 
   Future<String> whichVersionHave(String region) async {
     final response =
-        await http.get(baseUrlDDragon + "/realms/" + region + ".json");
+        await http.get(baseUrlDDragon + "realms/" + region + ".json");
     if (response.statusCode == 200) {
       var data = LolVersionResponse.fromJson(jsonDecode(response.body));
       return data.v;
@@ -22,12 +22,8 @@ class Api {
 
   Future<List<LolChampion>> getAllLolChampions(String language) async {
     var version = await whichVersionHave("euw");
-    final response = await http.get(baseUrlDDragon +
-        "/cdn/" +
-        version +
-        "/data/" +
-        language +
-        "/champion.json");
+    final response = await http
+        .get(cdnDdragon + version + "/data/" + language + "/champion.json");
     if (response.statusCode == 200) {
       var data = LolResponse.fromJson(jsonDecode(response.body));
       var champions = getChampions(data);
@@ -42,7 +38,7 @@ class Api {
     var keysChampions = response.data.keys.toList();
     for (var value in keysChampions) {
       String data = encoder.convert(response.data[value]);
-      var champion = LolChampion.fromJson(jsonDecode(data));
+      var champion = LolChampion.fromJson(response.version, jsonDecode(data));
       champions.add(champion);
     }
     return champions;
